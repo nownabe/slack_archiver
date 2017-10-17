@@ -1,0 +1,9 @@
+runtime: go
+api_version: go1.8
+
+handlers:
+  - url: /slack_archiver/.*
+    script: _go_app
+
+env_variables:
+  SLACK_API_TOKEN: YOUR_TOKEN
