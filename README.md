@@ -9,17 +9,32 @@ Slack Archiver
   * channels:write
 * Click "Install App to Workspace" and then get OAuth Access Token.
 
+# Edit YAMLs
+```bash
+cp app/app.yaml.example app/app.yaml
+vi app/app.yaml
+```
+
+```bash
+cp cron.yaml.example cron.yaml
+vi cron.yaml
+```
+
 # Development
 ```bash
 make run
 ```
 
 # Deploy
+
+App:
+
 ```bash
-cp app.yaml.example app.yaml
-vi app.yaml
-cp cron.yaml.example cron.yaml
-vi cron.yaml
-go get google.golang.org/appengine
-gcloud app deploy app.yaml cron.yaml
+make deploy
+```
+
+Cron:
+
+```bash
+make deploy-cron
 ```
