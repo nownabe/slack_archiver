@@ -8,9 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/log"
-	"google.golang.org/appengine/taskqueue"
+	"appengine"
+	"appengine/taskqueue"
 
 	"github.com/nownabe/slack_archiver/slack"
 )
@@ -46,11 +45,11 @@ func (sa *slackArchiver) archiveHandler(w http.ResponseWriter, r *http.Request) 
 		}
 		_, err := taskqueue.Add(ctx, t, "")
 		if err != nil {
-			log.Errorf(ctx, "Failed to queue archive task. %v", err)
+			ctx.Errorf("Failed to queue archive task. %v", err)
 			http.Error(w, "Error", http.StatusInternalServerError)
 			return
 		}
-		log.Infof(ctx, "Queued archive task.")
+		ctx.Infof("Queued archive task.")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "ok")
 		return
@@ -58,7 +57,7 @@ func (sa *slackArchiver) archiveHandler(w http.ResponseWriter, r *http.Request) 
 
 	channels, err := sa.ChannelsList(ctx, true, true)
 	if err != nil {
-		log.Errorf(ctx, "Failed to get channels list. %v", err)
+		ctx.Errorf("Failed to get channels list. %v", err)
 		http.Error(w, "Error", http.StatusInternalServerError)
 		return
 	}
@@ -74,18 +73,18 @@ func (sa *slackArchiver) archiveHandler(w http.ResponseWriter, r *http.Request) 
 				msg := history.Messages[0]
 				unixNano, err := strconv.ParseInt(strings.Replace(msg.TS, ".", "", -1), 10, 64)
 				if err != nil {
-					log.Errorf(ctx, "Failed to convert message timestamp into int64 %s. %v", msg.TS, err)
+					ctx.Errorf("Failed to convert message timestamp into int64 %s. %v", msg.TS, err)
 					break
 				}
 				latest := time.Unix(unixNano/1000000, 0)
-				log.Debugf(ctx, "Latest post in #%s was posted at %s.", c.Name, latest.Format(time.RFC3339))
+				ctx.Debugf("Latest post in #%s was posted at %s.", c.Name, latest.Format(time.RFC3339))
 
 				if now.Sub(latest) > time.Duration(24*30*2)*time.Hour {
 					// if err := sa.ChannelsArchive(ctx, c.ID); err != nil {
-					//   log.Errorf(ctx, "Failed to archive #%s. %v", c.Name, err)
+					//   ctx.Errorf("Failed to archive #%s. %v", c.Name, err)
 					//   break
 					// }
-					log.Infof(ctx, "Archived #%s %s", c.Name, c.ID)
+					ctx.Infof("Archived #%s %s", c.Name, c.ID)
 					archived++
 				}
 
@@ -93,17 +92,17 @@ func (sa *slackArchiver) archiveHandler(w http.ResponseWriter, r *http.Request) 
 			}
 
 			if rlerr, ok := err.(slack.RateLimitError); ok {
-				log.Warningf(ctx, "Rate Limit Error. Retrying. %v", err)
+				ctx.Warningf("Rate Limit Error. Retrying. %v", err)
 				time.Sleep(time.Duration(rlerr.RetryAfter) * time.Second)
 				continue
 			}
 
-			log.Errorf(ctx, "Failed to get history of channel %s (%s). %v", c.Name, c.ID, err)
+			ctx.Errorf("Failed to get history of channel %s (%s). %v", c.Name, c.ID, err)
 			break
 		}
 	}
 
-	log.Infof(ctx, "Archived %d channels (total: %d)", archived, total)
+	ctx.Infof("Archived %d channels (total: %d)", archived, total)
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, "ok")

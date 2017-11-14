@@ -1,7 +1,6 @@
 package slack
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,7 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"google.golang.org/appengine/urlfetch"
+	"appengine"
+	"appengine/urlfetch"
 )
 
 // Client is a slack api client.
@@ -23,7 +23,7 @@ func New(token string) *Client {
 	return &Client{token: token}
 }
 
-func (c *Client) call(ctx context.Context, method string, values url.Values, rv interface{}) error {
+func (c *Client) call(ctx appengine.Context, method string, values url.Values, rv interface{}) error {
 	endpoint := "https://slack.com/api/" + method
 
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(values.Encode()))
