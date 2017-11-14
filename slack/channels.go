@@ -10,7 +10,6 @@ import (
 // ChannelsArchive archives a channel.
 func (c *Client) ChannelsArchive(ctx appengine.Context, channel string) error {
 	values := url.Values{}
-	values.Add("token", c.token)
 	values.Add("channel", channel)
 
 	resp := responseCommon{}
@@ -25,7 +24,6 @@ func (c *Client) ChannelsArchive(ctx appengine.Context, channel string) error {
 // ChannelsHistory fetches history of messages and events from a channel.
 func (c *Client) ChannelsHistory(ctx appengine.Context, channel string, count int) (*History, error) {
 	values := url.Values{}
-	values.Add("token", c.token)
 	values.Add("channel", channel)
 	values.Add("count", fmt.Sprintf("%d", count))
 
@@ -41,7 +39,6 @@ func (c *Client) ChannelsHistory(ctx appengine.Context, channel string, count in
 // ChannelsList lists all channels in a Slack team.
 func (c *Client) ChannelsList(ctx appengine.Context, excludeArchived bool, excludeMembers bool) ([]Channel, error) {
 	values := url.Values{}
-	values.Add("token", c.token)
 	if excludeArchived {
 		values.Add("exclude_archived", "1")
 	}

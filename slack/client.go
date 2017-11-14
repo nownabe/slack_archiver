@@ -26,6 +26,8 @@ func New(token string) *Client {
 func (c *Client) call(ctx appengine.Context, method string, values url.Values, rv interface{}) error {
 	endpoint := "https://slack.com/api/" + method
 
+  values.Add("token", c.token)
+
 	req, err := http.NewRequest("POST", endpoint, strings.NewReader(values.Encode()))
 	if err != nil {
 		return err
