@@ -9,6 +9,11 @@ Slack Archiver
   * channels:write
 * Click "Install App to Workspace" and then get OAuth Access Token.
 
+# Development
+```bash
+make run
+```
+
 # Deploy
 ```bash
 cp app.yaml.example app.yaml
