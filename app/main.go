@@ -80,10 +80,10 @@ func (sa *slackArchiver) archiveHandler(w http.ResponseWriter, r *http.Request) 
 				ctx.Debugf("Latest post in #%s was posted at %s.", c.Name, latest.Format(time.RFC3339))
 
 				if now.Sub(latest) > time.Duration(24*30*2)*time.Hour {
-					// if err := sa.ChannelsArchive(ctx, c.ID); err != nil {
-					//   ctx.Errorf("Failed to archive #%s. %v", c.Name, err)
-					//   break
-					// }
+					if err := sa.ChannelsArchive(ctx, c.ID); err != nil {
+						ctx.Errorf("Failed to archive #%s. %v", c.Name, err)
+						break
+					}
 					ctx.Infof("Archived #%s %s", c.Name, c.ID)
 					archived++
 				}
